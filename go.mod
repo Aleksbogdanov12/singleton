@@ -24,7 +24,7 @@ require (
 	github.com/jaffee/commandeer v0.5.0
 	github.com/json-iterator/go v1.1.12
 	github.com/jucardi/go-osx v1.0.1
-	github.com/mackerelio/go-osstat v0.2.3
+	github.com/mackerelio/go-osstat v0.2.4
 	github.com/pkg/fileutils v0.0.0-20181114200823-d734b7f202ba
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.4.0
@@ -102,7 +102,7 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/tools v0.2.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
