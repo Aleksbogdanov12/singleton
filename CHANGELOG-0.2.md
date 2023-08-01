@@ -44,5 +44,6 @@ No Update.
 - Return default region when input is a language ([#149](https://github.com/vmware/singleton/issues/149))
 - Remove extra l10n folder in Singleton Service s3 build ([#194](https://github.com/vmware/singleton/issues/194))
 
+
 ### Action Required
 N/A
