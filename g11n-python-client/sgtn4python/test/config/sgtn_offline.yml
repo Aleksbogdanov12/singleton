@@ -1,0 +1,29 @@
+
+product: $PRODUCT
+l10n_version: $VERSION
+
+offline_resources_base_url: file:///../data/l10n
+
+# log path for the python client
+#log_path: ../log/
+
+cache_type: by_key
+
+locales:
+  - language_tag: en-US
+    source_resources_path:
+      - $COMPONENT/messages.properties
+    offline_resources_path:
+      - $COMPONENT/messages_en.properties
+  - language_tag: de
+  - language_tag: zh-Hans
+
+component_template:
+  locales_refer: locales
+  offline_resources_path:
+    - $COMPONENT/messages$LC.json
+ 
+components:
+  - name: about
+  - name: aboutadd
+  - name: contact
