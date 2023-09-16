@@ -1,45 +1,31 @@
-name: main
-on: [pull_request, push]
+name: Singleton Server  
+
+on:
+  push:
+    paths:
+    - '.github/workflows/main.yml'
+    - 'server/**'
+  pull_request:
+    paths: 
+    - '.github/workflows/main.yml'
+    - 'server/**'
+
+defaults:
+  run:
+    working-directory: server  
+    
 jobs:
   pre-process:
-    name: Pre process
-    runs-on: ubuntu-latest
-    outputs:
-      were-only-docs-updated: ${{ steps.were-only-docs-updated-action.outputs.were-only-docs-updated }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Get commit range
-        id: get-commit-range-action
-        uses: ./.github/actions/get-commit-range-action
-      - name: Were only docs updated
-        id: were-only-docs-updated-action
-        uses: ./.github/actions/were-only-docs-updated-action
-        with:
-          commit-range: ${{ steps.get-commit-range-action.outputs.commit-range }}
+    name: Pre-process
+    uses: aleksbogdanov12/singleton-monorepo/.github/workflows/pre-process.yml@devops
+
   check-header:
     name: Check Header
-    runs-on: ubuntu-latest
     needs: pre-process
     if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 2.  
-      - name: Get commit range
-        id: get-commit-range-action
-        uses: ./.github/actions/get-commit-range-action
-      - name: Check header
-        run: |
-          git clone --branch=devops https://github.com/vmware/singleton.git devops
-          cp $GITHUB_WORKSPACE/devops/check_headers.py .
-          chmod +x check_headers.py
-          git diff ${{ steps.get-commit-range-action.outputs.commit-range }} --stat
-          git diff --name-only --diff-filter=d ${{ steps.get-commit-range-action.outputs.commit-range }}
-          python ./check_headers.py -f "$(git diff --name-only --diff-filter=d ${{ steps.get-commit-range-action.outputs.commit-range }})"
+    uses: aleksbogdanov12/singleton-monorepo/.github/workflows/check.yml@devops
+
+
   unit-test:
     name: Unit Test
     runs-on: ubuntu-latest
@@ -47,78 +33,78 @@ jobs:
     if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up JDK
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: server
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '17'
       - name: Unit test
         run: |
-          cd $GITHUB_WORKSPACE/g11n-ws
-          ./gradlew test jacocoTestReport
-      - name: Upload Codecov report for vip-manager-i18n
-        uses: codecov/codecov-action@v2
+          cd $GITHUB_WORKSPACE/server/g11n-ws && ./gradlew test jacocoTestReport
+      - name: Upload Codecov 
+        uses: codecov/codecov-action@v3
         with:
-          files: ./g11n-ws/vip-manager-i18n/build/reports/jacoco.xml
-          flags: vip-manager-i18n
-      - name: Upload Codecov report for vip-manager-l10n
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./g11n-ws/vip-manager-l10n/build/reports/jacoco.xml
-          flags: vip-manager-l10n
-      - name: Upload Codecov report for vip-manager-lite-i18n
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./g11n-ws/vip-manager-lite-i18n/build/reports/jacoco.xml
-          flags: vip-manager-lite-i18n
+          files: g11n-ws/vip-manager-l10n/build/reports/jacoco.xml, g11n-ws/vip-manager-lite-i18n/build/reports/jacoco.xml, g11n-ws/vip-manager-i18n/build/reports/jacoco.xml
+          flags: g11n-ws
+          name: g11n-ws
+          verbose: true
+
   security-analysis:
     name: Security Analysis
     runs-on: ubuntu-latest
     needs: pre-process
-    if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes' 
     permissions:
       actions: read
       contents: read
       security-events: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: '17'
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
-
-  
-  codacy-analysis-cli:
-    name: Codacy Analysis CLI
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout code
-        uses: actions/checkout@main
-      - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@master  
+        uses: actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
         with:
-          output: results.sarif
-          format: sarif
-          # Adjust severity of non-security issues
-          gh-code-scanning-compat: true
-          # Force 0 exit code to allow SARIF file generation
-          # This will handover control about PR rejection to the GitHub side
-          max-allowed-issues: 2147483647  
-      # Upload the SARIF file generated in the previous step  
-      - name: Upload SARIF results file
-        uses: github/codeql-action/upload-sarif@main
-        with:
-          sarif_file: results.sarif  
-              
+          languages: java
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  codacy-security-scan:
+    name: Codacy Security Scan
+    runs-on: ubuntu-latest
+    needs: pre-process
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes' 
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        sparse-checkout: server
+
+    - name: Run Codacy Analysis CLI
+      uses: codacy/codacy-analysis-cli-action@master
+      with:
+        verbose: true
+        output: results.sarif
+        format: sarif
+        # Adjust severity of non-security issues
+        gh-code-scanning-compat: true
+        # Force 0 exit code to allow SARIF file generation
+        # This will hand over control about PR rejection to the GitHub side
+        max-allowed-issues: 2147483647
+    # Upload the SARIF file generated in the previous step
+    - name: Upload SARIF results file
+      uses: github/codeql-action/upload-sarif@main
+      with:
+        sarif_file: results.sarif
+            
   smoke-test:
     name: Smoke Test
     runs-on: ubuntu-latest
@@ -126,23 +112,26 @@ jobs:
     if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up JDK
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: server
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '17'
       - name: Smoke Test
         run: |
-          git clone --branch=devops https://github.com/vmware/singleton.git devops
-          cd $GITHUB_WORKSPACE/g11n-ws && ./gradlew build -x test
-          cp $GITHUB_WORKSPACE/devops/deploy/i18n-service/Dockerfile $GITHUB_WORKSPACE/publish/
-          cd $GITHUB_WORKSPACE/publish && ls
+          git clone --branch=devops --depth=1 https://github.com/vmware/singleton.git devops
+          cd $GITHUB_WORKSPACE/server/g11n-ws && ./gradlew build -x test
+          ls -la 
+          cp $GITHUB_WORKSPACE/server/devops/deploy/i18n-service/Dockerfile $GITHUB_WORKSPACE/server/publish/
+          cd $GITHUB_WORKSPACE/server/publish && ls
           mv singleton-[0~9]*.jar i18n-service.jar && ls
           docker build -t singleton .
           docker run -d -p 8090:8090 --name singleton singleton
           docker ps
-          cd $GITHUB_WORKSPACE/devops/autotest/service/i18n-service/APITest && $GITHUB_WORKSPACE/g11n-ws/gradlew build
+          cd $GITHUB_WORKSPACE/server/devops/autotest/service/i18n-service/APITest && $GITHUB_WORKSPACE/server/g11n-ws/gradlew build
           docker cp l10n singleton:/
           str=$(printf '=%.0s' {1..50})
           echo $str Smoke Test Start $str
@@ -158,8 +147,10 @@ jobs:
     if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up JDK
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: server
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
@@ -170,16 +161,16 @@ jobs:
           python-version: '3.10'
       - name: Performance Test
         run: |
-          git clone --branch=devops https://github.com/vmware/singleton.git devops
-          cd $GITHUB_WORKSPACE/g11n-ws && ./gradlew build -x test
-          cp $GITHUB_WORKSPACE/devops/performancetest/Dockerfile $GITHUB_WORKSPACE/publish/
-          cd $GITHUB_WORKSPACE/publish && ls
+          git clone --branch=devops --depth=1 https://github.com/vmware/singleton.git devops
+          cd $GITHUB_WORKSPACE/server/g11n-ws && ./gradlew build -x test
+          cp $GITHUB_WORKSPACE/server/devops/performancetest/Dockerfile $GITHUB_WORKSPACE/server/publish/
+          cd $GITHUB_WORKSPACE//server/publish && ls
           mv singleton-[0~9]*.jar i18n-service.jar && ls
-          cp -r $GITHUB_WORKSPACE/devops/performancetest/resource/l10n l10n
+          cp -r $GITHUB_WORKSPACE//server/devops/performancetest/resource/l10n l10n
           docker build -t singleton .
           docker run -d -p 8090:8090 --name singleton singleton
           docker ps
           str=$(printf '=%.0s' {1..50})
-          cd $GITHUB_WORKSPACE/devops/performancetest
+          cd $GITHUB_WORKSPACE/server/devops/performancetest
           pip install -r requirements.txt
           python performance.py

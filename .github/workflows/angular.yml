@@ -1,0 +1,115 @@
+name: Singleton Angular Client
+
+on:
+  push:
+    paths:
+    - '.github/workflows/angular.yml'
+    - 'g11n-angular-client/**'
+    - 'server/**'
+  pull_request:
+    paths: 
+    - '.github/workflows/angular.yml'
+    - 'g11n-angular-client/**'
+    - 'server/**'
+
+defaults:
+  run:
+    working-directory: g11n-angular-client
+
+jobs:
+  pre-process:
+    name: Pre-process
+    uses: aleksbogdanov12/singleton-monorepo/.github/workflows/pre-process.yml@devops
+
+  check-header:
+    name: Check Header
+    needs: pre-process
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
+    uses: aleksbogdanov12/singleton-monorepo/.github/workflows/check.yml@devops
+
+  unit-test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    needs: pre-process
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: g11n-angular-client
+      - name: Install node_js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Unit test
+        run: |
+          sed -i "s/'Chrome'/'ChromeHeadless'/g" projects/angular-client/karma.conf.js && cat projects/angular-client/karma.conf.js
+          npm install --registry https://registry.npmjs.org
+          ls -ltr
+          npm run test
+      - name: Coverage
+        run: |
+          npm install npm
+          npm install tslint
+          npm install typescript
+          npm run test
+      - name: Upload Codecov report for angular-client
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage/angular-client/lcov.info
+          flags: g11n-angular-client
+          
+
+  security-analysis:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    needs: pre-process
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install node_js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, typescript
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  codacy-analysis-cli:
+    name: Codacy Analysis CLI
+    runs-on: ubuntu-latest
+    if: needs.pre-process.outputs.were-only-docs-updated != 'yes'
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+      - name: Run Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@master  
+        with:
+          output: results.sarif
+          format: sarif
+          # Adjust severity of non-security issues
+          gh-code-scanning-compat: true
+          # Force 0 exit code to allow SARIF file generation
+          # This will handover control about PR rejection to the GitHub side
+          max-allowed-issues: 2147483647  
+      # Upload the SARIF file generated in the previous step  
+      - name: Upload SARIF results file
+        uses: github/codeql-action/upload-sarif@main
+        with:
+          sarif_file: results.sarif
+
+          
