@@ -1,0 +1,203 @@
+test: &default
+
+  # Credentials for REST APIs
+  # client_id: tee
+  # client_secret: 89987
+
+  # Mode can be 'live' or 'sandbox'
+  #mode: sandbox
+  log_file: ./smoke_test.log
+  log_level: INFO
+  # Credentials for Classic APIs
+  # app_id: APP-80W284485P519543T
+  # username: linr
+  # password: fdasf
+  # signature: sfds-RWy
+  # # # With Certificate
+  # # cert_path: "config/cert_key.pem"
+  # sandbox_email_address: linr@vmware.com
+
+  # #Product Name
+  product_name: RubyClient
+
+  # # bundle version
+  version: 4.8.1
+
+  # # HTTP Proxy
+  vip_server: http://localhost:8091
+
+  # # mode of bundle: online/offline
+
+  # # translation bundle Path
+  translation_bundle: ./config/locales/l10n/bundles
+
+  # # source bundle Path'about.testw'
+  source_bundle: ./config/locales/default
+
+  # # memory cache's expration(minutes), default value is 24*60
+  cache_expiry_period: 1
+
+#  disable_cache: true
+
+
+
+development:
+  <<: *default
+  vip_server: 
+  source_bundle: ./config/locales/defaultoffline
+
+onlinemode:
+  <<: *default
+
+  vip_server: http://localhost:8091
+  source_bundle: ./config/locales/defaultonlineserver
+  translation_bundle:
+
+devel:
+  <<: *default
+  vip_server:
+  source_bundle: ./config/locales/defaultoffline
+  translation_bundle:
+
+onlinetranslations:
+  <<: *default
+  version: 1.0
+  vip_server: http://localhost:8091
+  source_bundle: ./config/locales/defaultonlinetranslations
+  translation_bundle:
+
+translations:
+  <<: *default
+  version: 1.0
+  vip_server:
+  source_bundle: ./config/locales/defaultofflinetranslations
+  translation_bundle: ./config/locales/l10n/bundles
+
+
+onlyonlinemode:
+  <<: *default
+
+  vip_server: http://localhost:8091
+  source_bundle: 
+  translation_bundle:
+
+onlyonlinetranslations:
+  <<: *default
+
+  version: 1.0
+  vip_server: http://localhost:8091
+  source_bundle: 
+  translation_bundle:
+
+onlyofflinemode:
+  <<: *default
+  vip_server: 
+  source_bundle: 
+  translation_bundle: ./config/locales/l10n/bundles
+
+onlyofflinetranslations:
+  <<: *default
+  version: 1.0
+  vip_server: 
+  source_bundle: 
+  translation_bundle: ./config/locales/l10n/bundles
+
+onlineandofflinemode:
+  <<: *default
+
+  vip_server: http://localhost:8091
+  source_bundle: 
+  translation_bundle: ./config/locales/l10n/bundles
+
+onlineandofflinetranslations:
+  <<: *default
+  version: 1.0
+  vip_server: http://localhost:8091
+  source_bundle: 
+  translation_bundle: ./config/locales/l10n/bundles
+
+onlysource:
+  <<: *default
+
+  vip_server: 
+  source_bundle: ./config/locales/defaultonline
+  translation_bundle:
+
+onlysourcetranslations:
+  <<: *default
+
+  version: 1.0
+  vip_server: 
+  source_bundle: ./config/locales/defaultonlinetranslations
+  translation_bundle:
+
+mixed:
+  <<: *default
+
+  version: 4.8.2
+  vip_server: http://localhost:8091
+  source_bundle: ./config/locales/defaultmixed
+  translation_bundle: ./config/locales/l10n/bundles
+
+mixedtranslations:
+  <<: *default
+
+  version: 4.8.2
+  vip_server: http://localhost:8091
+  source_bundle: ./config/locales/defaultmixedtranslations
+  translation_bundle: ./config/locales/l10n/bundles
+
+production:
+  <<: *default
+  version: 1.1
+  source_bundle: ./config/locales/default
+  cache_expiry_period: 1
+#  disable_cache: true
+
+onlinemodedebug:
+  <<: *default
+
+  version: 4.8.1
+  vip_server: http://localhost:8091
+  source_bundle: ./config/locales/defaultonline
+  #source_bundle: ./config/locales/default
+  translation_bundle:
+  cache_expiry_period: 1
+
+onlinemodedebug2:
+  <<: *default
+
+  version: chanegre
+  vip_server: http://localhost:8091
+  source_bundle: 
+  #source_bundle: ./config/locales/default
+  translation_bundle:
+  cache_expiry_period: 1
+
+
+mixdebug:
+  <<: *default
+
+  version: 4.8.1
+  vip_server: http://localhost:8098
+  source_bundle: ./config/locales/defaultmixed
+  #source_bundle: ./config/locales/default
+  translation_bundle: ./config/locales/l10n/bundles
+  cache_expiry_period: 1
+
+
+versionfallback:
+  <<: *default
+  version: 4.8.3
+  source_bundle: 
+  translation_bundle: 
+
+
+testhttps:
+  <<: *default
+  vip_server: https://g11n-vip-dev-1.eng.vmware.com:8090
+  version: 4.8.1
+  source_bundle: 
+  translation_bundle: 
+
+

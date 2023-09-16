@@ -1,0 +1,9 @@
+{
+  "component" : "about",
+  "locale" : "fr",
+  "messages" : {
+    "about.description" : "Utilisez cette zone pour fournir des informations supplémentaires",
+    "about.message" : "La page Description de l'application.",
+    "about.title" : "Sur"
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "component":"contact",
+    "messages":{
+      "contact.key1":"test key de 1",
+      "contact.key2":"test key de 2"
+    },
+    "locale":"de"
+}

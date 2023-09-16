@@ -1,0 +1,9 @@
+{
+  "component" : "about",
+  "locale" : "latest",
+  "messages" : {
+    "about.description" : "Use this area to provide additional information",
+    "about.message" : "test_value dweqwdxadqweq",
+    "about.title" : "About"
+  }
+}

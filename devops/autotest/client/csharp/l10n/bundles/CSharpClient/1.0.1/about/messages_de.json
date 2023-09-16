@@ -1,0 +1,9 @@
+{
+  "component" : "about",
+  "locale" : "de",
+  "messages" : {
+    "about.description" : "Nutzen Sie diesen Bereich, um zusätzliche Informationen zu liefern",
+    "about.message" : "test_value",
+    "about.title" : "testÜber"
+  }
+}

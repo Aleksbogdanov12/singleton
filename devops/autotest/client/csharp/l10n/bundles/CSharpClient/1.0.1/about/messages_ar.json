@@ -1,0 +1,9 @@
+{
+    "component":"about",
+    "messages":{
+        "about.message":"test_value",
+        "about.title":"حول",
+        "about.description":"استخدم هذه المنطقة لتوفير معلومات إضافية"
+    },
+    "locale":"ar"
+}

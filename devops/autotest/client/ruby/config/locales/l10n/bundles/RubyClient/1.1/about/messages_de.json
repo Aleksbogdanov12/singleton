@@ -1,0 +1,10 @@
+{
+    "component" : "about",
+    "locale" : "de",
+    "messages" : {
+      "about.key1":"test value de 1",
+      "about.key2":"test value de 2",
+      "about.key3":"test value de 3",
+      "about.key4":"test value de 4"
+    }
+}

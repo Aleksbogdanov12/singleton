@@ -1,0 +1,9 @@
+{
+  "component" : "about",
+  "locale" : "ko",
+  "messages" : {
+    "about.description" : "이 영역을 사용 하 여 추가 정보 제공",
+    "about.message" : "test_value",
+    "about.title" : "에 대 한"
+  }
+}
