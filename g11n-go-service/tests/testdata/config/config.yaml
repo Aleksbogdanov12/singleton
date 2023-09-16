@@ -1,0 +1,54 @@
+BundleLocation: local # local or s3
+
+LocalBundle:
+  BasePath: testdata/bundles
+
+S3Bundle:
+  PublicKeyFile: # file content is used to decode AccessKey and SecretKey
+  AccessKey: myAccessKey
+  SecretKey: mySecretkey
+  RoleArn: myRoleArn
+  SessionDuration: 3600
+  Region: myRegion
+  BucketName: myBucketName
+  BundleRoot: myBundleRoot
+
+RefreshBundleInterval: 30m # interval to refresh bundle information. 0s means never to refresh.
+
+HeaderOfTraceID: # comma separated headers carrying trace ID
+
+Server:
+  RunMode: debug # debug, release
+  Schema: http # http, https, http&https
+  HTTPSPort: 8090
+  HTTPPort: 8091
+  ReadTimeout: 0s
+  WriteTimeout: 0s
+  CertFile: testdata/https/server.pem
+  KeyFile: testdata/https/server.key
+  MaxHeaderBytes: 1024000
+  CacheControl: max-age=2, public
+  CompressionAlgorithm: gzip&br #gzip, br, gzip&br
+
+CrossDomain:
+  Enable: true
+  AllowCredentials: true
+  AllowOrigin: "*"
+  AllowMethods: GET,POST,PUT,DELETE,OPTIONS
+  AllowHeaders: csp-auth-token,Content-Type,x-xmp-ui,Authorization
+  MaxAge: 3600s
+
+LOG:
+  Filename: logs/singleton.log
+  MaxSize: 1 # megabytes
+  MaxBackups: 1
+  MaxAge: 365 # days
+  Level: debug # level in file log
+  ConsoleLevel: debug # level in console log
+
+Cache:
+  MaxEntities: 100 # number of bundle files in cache
+  Expiration: 10s # 0s means cache never expires
+
+SwaggerUI: true
+AllowList: true
