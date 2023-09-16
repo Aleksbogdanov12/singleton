@@ -1,0 +1,26 @@
+﻿
+product: CSHARP
+l10n_version: 1.0.0
+
+offline_resources_base_url: SingletonRes
+default_resource_format: resx, internal
+
+prod_mode: true
+
+
+locales:
+  - language_tag: en-US
+  - language_tag: de-DE
+  - language_tag: zh-Hans
+  - language_tag: ur_PK
+
+component_template:
+  locales_refer: locales
+  offline_resources_path:
+    - source.$COMPONENT
+
+components: 
+  - name: about
+  - name: index
+  - name: contact
+  - name: common

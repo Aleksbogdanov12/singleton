@@ -1,0 +1,42 @@
+﻿
+product: CSHARP
+l10n_version: 1.0.0
+
+online_service_url: http://127.0.0.1:8090
+
+offline_resources_base_url: SingletonRes.Singleton
+default_resource_format: properties, internal
+
+prod_mode: false
+default_locale: en-US
+
+# optional, access service type
+access_service_type: default
+
+# optional, cache type
+cache_type: default
+# optional, cache expire time
+cache_expire: 15
+# optional, wait of timeout or retry when connection fails
+try_wait: 5
+
+# optional, logger type
+logger_type: default
+# optional, log level
+log_level: Debug
+
+
+component_template:
+  offline_resources_path:
+    - $COMPONENT_$LOCALE
+  locales:
+    - language_tag: en-US
+      offline_resources_path:
+        - $COMPONENT
+    - language_tag: de-DE
+
+components: 
+  - name: about
+  - name: index
+  - name: contact
+  - name: common
